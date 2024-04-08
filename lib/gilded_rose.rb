@@ -8,48 +8,51 @@ class GildedRose
   end
 
   def tick
-    if @name != "Aged Brie" and @name != "Backstage passes to a TAFKAL80ETC concert"
-      if @quality > 0
-        if @name != "Legendary Sulfuras, Hand of Ragnaros"
-          @quality = @quality - 1
-        end
-      end
+    case @name
+    when'Normal Item'
+      normal_tick
+    when'Aged Brie'
+      bri_tick
+    when'Legendary Sulfuras, Hand of Ragnaros'
+      return
+    when'Backstage passes to a TAFKAL80ETC concert'
+      passes_tick
+    when'Conjured Mana Cake'
+      cake_tick
+    end
+
+    @days_remaining -= 1 
+  end
+
+  def normal_tick 
+    return if @quality == 0 
+  
+    @days_remaining.positive? ? @quality -= 1 : @quality -= 2
+  end
+
+  def bri_tick
+    @days_remaining.positive? ? @quality += 1 :  @quality += 2
+    @quality = 50 if @quality >= 50 
+  end
+
+  def passes_tick
+    case @days_remaining
+    when -Float::INFINITY..0
+      @quality = 0 
+    when 1..5
+      @quality += 3
+    when 5..10
+      @quality += 2
     else
-      if @quality < 50
-        @quality = @quality + 1
-        if @name == "Backstage passes to a TAFKAL80ETC concert"
-          if @days_remaining < 11
-            if @quality < 50
-              @quality = @quality + 1
-            end
-          end
-          if @days_remaining < 6
-            if @quality < 50
-              @quality = @quality + 1
-            end
-          end
-        end
-      end
+      @quality += 1 
     end
-    if @name != "Legendary Sulfuras, Hand of Ragnaros"
-      @days_remaining = @days_remaining - 1
-    end
-    if @days_remaining < 0
-      if @name != "Aged Brie"
-        if @name != "Backstage passes to a TAFKAL80ETC concert"
-          if @quality > 0
-            if @name != "Legendary Sulfuras, Hand of Ragnaros"
-              @quality = @quality - 1
-            end
-          end
-        else
-          @quality = @quality - @quality
-        end
-      else
-        if @quality < 50
-          @quality = @quality + 1
-        end
-      end
-    end
+  
+    @quality = 50 if @quality >= 50 
+  end
+
+  def cake_tick
+    return if @quality == 0
+
+    @days_remaining.positive? ? @quality -= 2 : @quality -= 4
   end
 end
